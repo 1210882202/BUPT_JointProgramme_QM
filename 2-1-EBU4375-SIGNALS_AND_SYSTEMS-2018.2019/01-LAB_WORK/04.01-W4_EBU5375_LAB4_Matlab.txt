@@ -1,0 +1,71 @@
+
+%%
+
+load NewYork % Loads the audio signal x
+%sound(x,Fs,BITS) % Reproduces audio signal
+
+ts=1/Fs; % Fs: Sampling frequency, ts: sampling period
+t=[0:ts:(length(x)-1)*ts]; % Time axis
+subplot(3,1,1)
+plot(t,x) % Plot signal in the time domain
+ylabel('Amplitude [a.u.]')
+xlabel('t [s]')
+axis tight
+
+subplot(3,1,2)
+[Pxx,F]=pwelch(x,[],[],[],Fs,'onesided');
+plot(F,Pxx) % Plot signal in the frequency domain
+ylabel('')
+xlabel('Frequency (kHz)')
+axis tight
+
+subplot(3,1,3)
+pwelch(x,[],[],[],Fs); % Plots signal in the frequency domain, logarithmic
+
+
+%%
+figure
+[b,a]=butter(10,0.8/24,'low'); % Defines lowpass filter
+[H,W] = freqz(b,a,128,Fs);
+subplot(2,1,1)
+plot(W/1000,abs(H)) % Plots lowpass filter frequency response
+ylabel('|H(f)|')
+xlabel('Frequency (kHz)')
+axis tight
+x_fpb = filtfilt(b,a,x); % Lowpass filters audio signal
+subplot(2,1,2)
+pwelch(x_fpb,[],[],[],Fs); % Plots spectrum of filtered signal
+sound(x_fpb,Fs,BITS) 
+
+%%
+figure
+[b,a]=butter(25,4/24,'high');% Defines highpass filter
+[H,W] = freqz(b,a,128,Fs);
+subplot(2,1,1)
+plot(W,abs(H))% Plots highpass filter frequency response
+ylabel('|H(f)|')
+xlabel('Frequency (kHz)')
+axis tight
+x_fpa = filtfilt(b,a,x); % Highpass filters audio signal
+subplot(2,1,2)
+pwelch(x_fpa,[],[],[],Fs); % Plots spectrum of filtered signal
+sound(x_fpa,Fs,BITS)
+%%
+
+[F,Pxx]=pwelch(x,[],[],[],Fs); % Plots signal in the frequency domain
+subplot(2,1,1)
+plot(Pxx,F) % Plot signal in the time domain
+ylabel('Original')
+xlabel('Frequency (kHz)')
+axis tight
+
+x_s=zeros(size(x));
+x_s(1:6:end)=x(1:6:end);
+subplot(2,1,2)
+[F,Pxx]=pwelch(x_s,[],[],[],Fs); % Plots signal in the frequency domain
+plot(Pxx,F)
+ylabel('Sampled')
+xlabel('Frequency (kHz)')
+axis tight
+
+sound(x_s,Fs,BITS) % Reproduces audio signal
