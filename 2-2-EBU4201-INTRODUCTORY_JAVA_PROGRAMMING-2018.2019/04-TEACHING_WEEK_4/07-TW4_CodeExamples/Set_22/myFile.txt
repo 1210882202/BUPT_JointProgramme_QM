@@ -1,0 +1,3 @@
+Writing line 1 to file
+Writing line 2 to file
+Writing line 3 to file
